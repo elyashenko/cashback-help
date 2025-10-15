@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: cashback-bot-db
+    environment:
+      POSTGRES_DB: cashback_bot
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bot:
+    build: .
+    container_name: cashback-bot
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/cashback_bot
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+

@@ -1,0 +1,69 @@
+# Cashback-Help Bot Development Rules
+
+## Code Style
+- Use TypeScript strict mode
+- Follow Airbnb TypeScript style guide
+- Use async/await over promises
+- Prefer functional programming patterns
+- Use descriptive variable names (no single letters except i, j in loops)
+
+## Architecture
+- Follow repository pattern for database access
+- Keep business logic in services, not controllers
+- Use dependency injection where possible
+- Separate concerns: controllers → services → repositories
+
+## Database
+- Always use migrations for schema changes
+- Never write raw SQL in services (use ORM)
+- Add indexes for frequently queried columns
+- Use transactions for multi-step operations
+
+## Error Handling
+- Always wrap async operations in try-catch
+- Log errors with context (userId, action, timestamp)
+- Send user-friendly error messages to Telegram
+- Use custom error classes for different error types
+
+## Security
+- Validate all user inputs with Zod
+- Sanitize data before database insertion
+- Never log sensitive data (tokens, passwords)
+- Use environment variables for secrets
+
+## Testing
+- Write unit tests for services
+- Write integration tests for critical flows (payment, subscription)
+- Mock external APIs (Telegram, LLM providers)
+- Aim for >80% code coverage
+
+## Performance
+- Cache frequently accessed data (banks, categories)
+- Use database indexes for search queries
+- Limit LLM API calls (use caching when possible)
+- Implement rate limiting per user
+
+## Telegram Bot Best Practices
+- Always acknowledge user actions immediately
+- Use inline keyboards for better UX
+- Send typing indicators for long operations
+- Handle webhook timeouts (respond within 5 seconds)
+
+## LangChain Integration
+- Set temperature to 0.3 for consistent results
+- Use structured output parsers
+- Implement fallback chain: DeepSeek → Yandex GPT
+- Cache LLM responses for identical queries
+
+## Logging
+- Use Winston with JSON format
+- Log levels: error, warn, info, debug
+- Include context: userId, action, duration
+- Rotate logs daily in production
+
+## Documentation
+- Document all public methods with JSDoc
+- Update README for new features
+- Keep API docs in sync with code
+- Add inline comments for complex logic
+

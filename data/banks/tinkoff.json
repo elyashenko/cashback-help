@@ -1,0 +1,40 @@
+{
+  "bank": {
+    "name": "Тинькофф",
+    "code": "tinkoff",
+    "logoUrl": "https://example.com/tinkoff-logo.png"
+  },
+  "categories": [
+    {
+      "name": "Рестораны",
+      "mccCodes": ["5811", "5812", "5813", "5814"],
+      "cashbackRate": 6.0
+    },
+    {
+      "name": "Заправки",
+      "mccCodes": ["5541", "5542", "5983"],
+      "cashbackRate": 5.0
+    },
+    {
+      "name": "Продукты",
+      "mccCodes": ["5411", "5412", "5422", "5451", "5462"],
+      "cashbackRate": 3.0
+    },
+    {
+      "name": "Развлечения",
+      "mccCodes": ["7832", "7841", "7922", "7929", "7933", "7991", "7996", "7998"],
+      "cashbackRate": 10.0
+    },
+    {
+      "name": "Одежда",
+      "mccCodes": ["5611", "5621", "5631", "5641", "5651", "5661", "5699"],
+      "cashbackRate": 5.0
+    },
+    {
+      "name": "Аптеки",
+      "mccCodes": ["5912", "5122"],
+      "cashbackRate": 2.0
+    }
+  ]
+}
+
