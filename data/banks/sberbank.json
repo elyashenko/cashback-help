@@ -8,27 +8,27 @@
     {
       "name": "Рестораны и кафе",
       "mccCodes": ["5811", "5812", "5813", "5814"],
-      "cashbackRate": 5.0
+      "description": null
     },
     {
       "name": "АЗС",
       "mccCodes": ["5541", "5542"],
-      "cashbackRate": 3.0
+      "description": null
     },
     {
       "name": "Супермаркеты",
       "mccCodes": ["5411", "5412", "5422", "5451"],
-      "cashbackRate": 2.0
+      "description": null
     },
     {
       "name": "Аптеки",
       "mccCodes": ["5912", "5122"],
-      "cashbackRate": 1.5
+      "description": null
     },
     {
       "name": "Одежда и обувь",
       "mccCodes": ["5611", "5621", "5631", "5651", "5661", "5691"],
-      "cashbackRate": 5.0
+      "description": null
     }
   ]
 }
