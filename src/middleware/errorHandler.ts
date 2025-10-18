@@ -43,4 +43,3 @@ export const errorHandler: MiddlewareFn<Context> = async (ctx, next) => {
     }
   }
 };
-

@@ -29,9 +29,6 @@ export class CashbackCategory {
   @Index('idx_mcc_codes', { synchronize: false })
   mccCodes!: string[];
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true, name: 'cashback_rate' })
-  cashbackRate?: number;
-
   @Column({ type: 'boolean', default: true, name: 'is_active' })
   @Index()
   isActive!: boolean;
@@ -39,4 +36,3 @@ export class CashbackCategory {
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 }
-

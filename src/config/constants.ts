@@ -48,4 +48,3 @@ export const QUERY_TYPES = {
   CATEGORY_SEARCH: 'category_search',
   FAVORITE_VIEW: 'favorite_view',
 } as const;
-

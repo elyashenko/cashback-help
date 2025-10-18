@@ -14,9 +14,7 @@ export class AnalyticsRepository {
     return this.repository.count({ where: { userId } });
   }
 
-  async getUserQueriesByType(
-    userId: number,
-  ): Promise<Array<{ queryType: string; count: number }>> {
+  async getUserQueriesByType(userId: number): Promise<Array<{ queryType: string; count: number }>> {
     return this.repository
       .createQueryBuilder('log')
       .select('log.query_type', 'queryType')
@@ -62,4 +60,3 @@ export class AnalyticsRepository {
       .getMany();
   }
 }
-

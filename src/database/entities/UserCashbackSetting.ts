@@ -3,22 +3,24 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  UpdateDateColumn,
+  Index,
   ManyToOne,
   JoinColumn,
-  Index,
+  Unique,
 } from 'typeorm';
 import { User } from './User';
 import { Bank } from './Bank';
 import { CashbackCategory } from './CashbackCategory';
 
-@Entity('user_favorite_categories')
-@Index(['userId', 'bankId', 'categoryId'], { unique: true })
-@Index(['userId'])
-export class UserFavoriteCategory {
+@Entity('user_cashback_settings')
+@Unique(['userId', 'bankId', 'categoryId'])
+export class UserCashbackSetting {
   @PrimaryGeneratedColumn()
   id!: number;
 
   @Column({ type: 'integer', name: 'user_id' })
+  @Index()
   userId!: number;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
@@ -26,6 +28,7 @@ export class UserFavoriteCategory {
   user?: User;
 
   @Column({ type: 'integer', name: 'bank_id' })
+  @Index()
   bankId!: number;
 
   @ManyToOne(() => Bank, { onDelete: 'CASCADE' })
@@ -33,6 +36,7 @@ export class UserFavoriteCategory {
   bank?: Bank;
 
   @Column({ type: 'integer', name: 'category_id' })
+  @Index()
   categoryId!: number;
 
   @ManyToOne(() => CashbackCategory, { onDelete: 'CASCADE' })
@@ -43,15 +47,21 @@ export class UserFavoriteCategory {
     type: 'decimal',
     precision: 5,
     scale: 2,
-    nullable: true,
     name: 'cashback_rate',
     transformer: {
       to: (value: number) => value,
-      from: (value: string) => (value ? parseFloat(value) : null),
+      from: (value: string) => parseFloat(value),
     },
   })
-  cashbackRate?: number;
+  cashbackRate!: number;
 
-  @CreateDateColumn({ name: 'added_at' })
-  addedAt!: Date;
+  @Column({ type: 'boolean', default: true, name: 'is_active' })
+  @Index()
+  isActive!: boolean;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt!: Date;
 }

@@ -9,10 +9,10 @@ export class UserService {
   async getOrCreateUser(data: CreateUserDto): Promise<User> {
     try {
       const user = await this.userRepository.findOrCreate(data);
-      
+
       // Check and reset monthly limits if needed
       await this.userRepository.checkAndResetMonthlyLimits(user.id);
-      
+
       return user;
     } catch (error) {
       logger.error('Error in getOrCreateUser:', { error, data });
@@ -42,4 +42,3 @@ export class UserService {
     };
   }
 }
-

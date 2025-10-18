@@ -1,5 +1,4 @@
 import { Context } from 'telegraf';
-import { BankService } from '../services/bankService';
 import { CategoryService } from '../services/categoryService';
 import { PDFService } from '../services/pdfService';
 import { AnalyticsService } from '../services/analyticsService';
@@ -9,13 +8,13 @@ export class AdminController {
   private adminUserIds: Set<number>;
 
   constructor(
-    private bankService: BankService,
     private categoryService: CategoryService,
     private pdfService: PDFService,
     private analyticsService: AnalyticsService,
   ) {
     // Parse admin user IDs from environment
-    const adminIds = process.env.ADMIN_USER_IDS?.split(',').map((id) => parseInt(id.trim(), 10)) || [];
+    const adminIds =
+      process.env.ADMIN_USER_IDS?.split(',').map((id) => parseInt(id.trim(), 10)) || [];
     this.adminUserIds = new Set(adminIds);
   }
 
@@ -134,4 +133,3 @@ export class AdminController {
     }
   }
 }
-

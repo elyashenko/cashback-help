@@ -15,7 +15,7 @@ export const getCached = <T>(key: string): T | undefined => {
 };
 
 export const setCached = <T>(key: string, value: T, ttl?: number): void => {
-  cache.set(key, value, { ttl });
+  cache.set(key, value as any, { ttl });
 };
 
 export const deleteCached = (key: string): void => {
@@ -25,4 +25,3 @@ export const deleteCached = (key: string): void => {
 export const clearCache = (): void => {
   cache.clear();
 };
-

@@ -24,7 +24,7 @@ export class LLMService {
         return cached;
       }
 
-      const parser = StructuredOutputParser.fromZodSchema(QueryIntentSchema);
+      const parser = StructuredOutputParser.fromZodSchema(QueryIntentSchema as any);
 
       const prompt = PromptTemplate.fromTemplate(
         `Проанализируй запрос пользователя и извлеки информацию.
@@ -44,10 +44,10 @@ export class LLMService {
       const llm = getLLM();
       const chain = prompt.pipe(llm).pipe(parser);
 
-      const result = await chain.invoke({
+      const result = (await chain.invoke({
         query: text,
         format_instructions: parser.getFormatInstructions(),
-      });
+      })) as QueryIntent;
 
       // Cache the result
       setCached(cacheKey, result, 3600000); // 1 hour
@@ -57,7 +57,7 @@ export class LLMService {
       return result;
     } catch (error) {
       logger.error('Error parsing query with LLM:', { error, text });
-      
+
       // Fallback: simple pattern matching
       return this.fallbackParse(text);
     }
@@ -65,7 +65,7 @@ export class LLMService {
 
   private fallbackParse(text: string): QueryIntent {
     const mccMatch = text.match(/\b(\d{4})\b/);
-    
+
     if (mccMatch) {
       return {
         queryType: 'mcc_search',
@@ -105,4 +105,3 @@ export class LLMService {
     return null;
   }
 }
-

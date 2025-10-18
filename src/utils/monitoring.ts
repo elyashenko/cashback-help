@@ -41,4 +41,3 @@ export const metrics = {
 export const getMetrics = async (): Promise<string> => {
   return register.metrics();
 };
-

@@ -32,4 +32,3 @@ export class Bank {
   @OneToMany(() => CashbackCategory, (category) => category.bank)
   categories?: CashbackCategory[];
 }
-

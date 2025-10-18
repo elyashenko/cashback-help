@@ -18,6 +18,7 @@ export class PaymentService {
         title: 'Cashback-Help Pro подписка',
         description: 'Безлимитные банки и категории на 30 дней',
         payload: `sub_pro_${userId}_${Date.now()}`,
+        provider_token: '', // Not needed for Telegram Stars
         currency: 'XTR', // Telegram Stars
         prices: [
           {
@@ -99,4 +100,3 @@ export class PaymentService {
     return this.paymentRepository.findByUserId(userId);
   }
 }
-

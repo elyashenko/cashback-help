@@ -34,10 +34,10 @@ export class PDFService {
 
       // Try to match MCC codes (4 digits, possibly comma-separated)
       const mccMatch = trimmed.match(/(\d{4}(?:,\s*\d{4})*)/);
-      
+
       if (mccMatch) {
         const mccCodes = mccMatch[1].split(',').map((code) => code.trim());
-        
+
         if (currentCategory) {
           currentCategory.mccCodes.push(...mccCodes);
         }
@@ -94,4 +94,3 @@ export class PDFService {
     return true;
   }
 }
-

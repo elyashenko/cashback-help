@@ -36,4 +36,3 @@ export class BankRepository {
     return count > 0;
   }
 }
-

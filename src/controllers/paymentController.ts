@@ -45,9 +45,7 @@ export class PaymentController {
 
         await ctx.replyWithMarkdownV2(message, {
           reply_markup: {
-            inline_keyboard: [
-              [{ text: '✨ Купить Pro подписку', callback_data: 'buy_pro' }],
-            ],
+            inline_keyboard: [[{ text: '✨ Купить Pro подписку', callback_data: 'buy_pro' }]],
           },
         });
         return;
@@ -87,4 +85,3 @@ export class PaymentController {
     }
   }
 }
-

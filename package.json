@@ -4,7 +4,7 @@
   "description": "Telegram bot for searching MCC codes by cashback categories for various banks",
   "main": "src/app.ts",
   "scripts": {
-    "dev": "tsx --env-file=.env watch src/app.ts",
+    "dev": "tsx --env-file=.env --watch src/app.ts",
     "build": "tsc",
     "start": "tsx --env-file=.env src/app.ts",
     "migration:generate": "typeorm-ts-node-commonjs migration:generate",
@@ -32,7 +32,9 @@
     "@langchain/core": "^0.3.0",
     "@langchain/openai": "^0.3.0",
     "@sentry/node": "^8.0.0",
+    "@telegraf/session": "^2.0.0-beta.7",
     "dotenv": "^16.4.0",
+    "kysely": "^0.27.2",
     "langchain": "^0.3.0",
     "lru-cache": "^11.0.0",
     "pdf-parse": "^1.1.1",

@@ -7,9 +7,13 @@ import { logger } from '../utils/logger';
 export class BankService {
   constructor(private bankRepository: BankRepository) {}
 
+  async getActiveBanks(): Promise<Bank[]> {
+    return this.getAllBanks(true);
+  }
+
   async getAllBanks(activeOnly: boolean = true): Promise<Bank[]> {
     const cacheKey = getCacheKey('banks', activeOnly ? 'active' : 'all');
-    
+
     let banks = getCached<Bank[]>(cacheKey);
     if (banks) {
       return banks;
@@ -17,13 +21,13 @@ export class BankService {
 
     banks = await this.bankRepository.findAll(activeOnly);
     setCached(cacheKey, banks);
-    
+
     return banks;
   }
 
   async getBankById(id: number): Promise<Bank | null> {
     const cacheKey = getCacheKey('bank', id);
-    
+
     let bank = getCached<Bank | null>(cacheKey);
     if (bank !== undefined) {
       return bank;
@@ -31,7 +35,7 @@ export class BankService {
 
     bank = await this.bankRepository.findById(id);
     setCached(cacheKey, bank);
-    
+
     return bank;
   }
 
@@ -48,7 +52,7 @@ export class BankService {
 
       const bank = await this.bankRepository.create(data);
       logger.info('Bank created:', { bankId: bank.id, name: bank.name });
-      
+
       return bank;
     } catch (error) {
       logger.error('Error creating bank:', { error, data });
@@ -66,4 +70,3 @@ export class BankService {
     logger.info('Bank active status changed:', { bankId: id, isActive });
   }
 }
-

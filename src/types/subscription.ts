@@ -17,4 +17,3 @@ export interface UpgradeToProDto {
   durationDays: number;
   transactionId: string;
 }
-

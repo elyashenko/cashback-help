@@ -12,10 +12,7 @@ export class FavoriteRepository {
     });
   }
 
-  async findByUserAndBank(
-    userId: number,
-    bankId: number,
-  ): Promise<UserFavoriteCategory[]> {
+  async findByUserAndBank(userId: number, bankId: number): Promise<UserFavoriteCategory[]> {
     return this.repository.find({
       where: { userId, bankId },
       relations: ['category'],
@@ -31,11 +28,7 @@ export class FavoriteRepository {
     return this.repository.count({ where: { userId, bankId } });
   }
 
-  async exists(
-    userId: number,
-    bankId: number,
-    categoryId: number,
-  ): Promise<boolean> {
+  async exists(userId: number, bankId: number, categoryId: number): Promise<boolean> {
     const count = await this.repository.count({
       where: { userId, bankId, categoryId },
     });
@@ -46,9 +39,32 @@ export class FavoriteRepository {
     userId: number,
     bankId: number,
     categoryId: number,
+    cashbackRate?: number,
   ): Promise<UserFavoriteCategory> {
-    const favorite = this.repository.create({ userId, bankId, categoryId });
+    const favorite = this.repository.create({
+      userId,
+      bankId,
+      categoryId,
+      cashbackRate,
+    });
     return this.repository.save(favorite);
+  }
+
+  async updateCashbackRate(
+    userId: number,
+    bankId: number,
+    categoryId: number,
+    cashbackRate: number,
+  ): Promise<void> {
+    await this.repository.update({ userId, bankId, categoryId }, { cashbackRate });
+  }
+
+  async findByUserWithCashback(userId: number): Promise<UserFavoriteCategory[]> {
+    return this.repository.find({
+      where: { userId },
+      relations: ['bank', 'category'],
+      order: { addedAt: 'DESC' },
+    });
   }
 
   async remove(userId: number, bankId: number, categoryId: number): Promise<void> {
@@ -69,4 +85,3 @@ export class FavoriteRepository {
     return favorites.map((f) => f.bankId);
   }
 }
-

@@ -3,6 +3,7 @@ import { User } from '../database/entities/User';
 import { Bank } from '../database/entities/Bank';
 import { CashbackCategory } from '../database/entities/CashbackCategory';
 import { UserFavoriteCategory } from '../database/entities/UserFavoriteCategory';
+import { UserCashbackSetting } from '../database/entities/UserCashbackSetting';
 import { PaymentHistory } from '../database/entities/PaymentHistory';
 import { QueryLog } from '../database/entities/QueryLog';
 
@@ -11,7 +12,15 @@ export const AppDataSource = new DataSource({
   url: process.env.DATABASE_URL,
   synchronize: false, // Use migrations in production
   logging: process.env.DATABASE_LOGGING === 'true',
-  entities: [User, Bank, CashbackCategory, UserFavoriteCategory, PaymentHistory, QueryLog],
+  entities: [
+    User,
+    Bank,
+    CashbackCategory,
+    UserFavoriteCategory,
+    UserCashbackSetting,
+    PaymentHistory,
+    QueryLog,
+  ],
   migrations: ['src/database/migrations/*.ts'],
   subscribers: [],
   extra: {
@@ -29,4 +38,3 @@ export const initializeDatabase = async () => {
     throw error;
   }
 };
-

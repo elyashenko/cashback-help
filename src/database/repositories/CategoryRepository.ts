@@ -34,10 +34,7 @@ export class CategoryRepository {
     return query.getMany();
   }
 
-  async searchByName(
-    searchTerm: string,
-    bankId?: number,
-  ): Promise<CashbackCategory[]> {
+  async searchByName(searchTerm: string, bankId?: number): Promise<CashbackCategory[]> {
     const query = this.repository
       .createQueryBuilder('category')
       .leftJoinAndSelect('category.bank', 'bank')
@@ -90,4 +87,3 @@ export class CategoryRepository {
     });
   }
 }
-

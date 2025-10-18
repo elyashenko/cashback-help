@@ -37,4 +37,3 @@ export class PaymentHistory {
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 }
-

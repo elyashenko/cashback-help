@@ -30,10 +30,8 @@ if (process.env.NODE_ENV === 'production') {
   logger.add(
     new winston.transports.File({
       filename: 'logs/app-%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
+      maxsize: 20 * 1024 * 1024, // 20MB
+      maxFiles: 14, // 14 days
     }),
   );
 }
-

@@ -1,4 +1,5 @@
 import { Context } from 'telegraf';
+import { BotSession } from './session';
 
 export interface SessionData {
   searchMode?: 'category' | 'mcc';
@@ -6,6 +7,5 @@ export interface SessionData {
 }
 
 export interface BotContext extends Context {
-  session?: SessionData;
+  session?: BotSession;
 }
-

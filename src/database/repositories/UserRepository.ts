@@ -21,7 +21,7 @@ export class UserRepository {
 
   async findOrCreate(data: CreateUserDto): Promise<User> {
     let user = await this.findByTelegramId(data.telegramId);
-    
+
     if (!user) {
       user = await this.create(data);
     }
@@ -29,11 +29,7 @@ export class UserRepository {
     return user;
   }
 
-  async updateSubscription(
-    userId: number,
-    type: 'free' | 'pro',
-    expiryDate?: Date,
-  ): Promise<void> {
+  async updateSubscription(userId: number, type: 'free' | 'pro', expiryDate?: Date): Promise<void> {
     await this.repository.update(userId, {
       subscriptionType: type,
       subscriptionExpiry: expiryDate,
@@ -69,4 +65,3 @@ export class UserRepository {
       .getCount();
   }
 }
-

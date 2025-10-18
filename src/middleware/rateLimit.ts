@@ -18,7 +18,7 @@ export const createRateLimitMiddleware = (): MiddlewareFn<Context> => {
     const userId = ctx.from.id;
     // @ts-ignore
     const subscriptionType = ctx.subscriptionStatus?.type || 'free';
-    const limits = RATE_LIMIT[subscriptionType];
+    const limits = RATE_LIMIT[subscriptionType as keyof typeof RATE_LIMIT];
 
     const now = Date.now();
     let entry = rateLimitStore.get(userId);
@@ -61,4 +61,3 @@ setInterval(() => {
     }
   }
 }, 60000); // Run every minute
-

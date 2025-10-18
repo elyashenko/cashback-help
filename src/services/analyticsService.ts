@@ -33,7 +33,7 @@ export class AnalyticsService {
 
       const queriesByTypeMap = queriesByType.reduce(
         (acc, { queryType, count }) => {
-          acc[queryType as keyof typeof acc] = parseInt(count, 10);
+          acc[queryType as keyof typeof acc] = Number(count);
           return acc;
         },
         { mcc_search: 0, category_search: 0, favorite_view: 0 },
@@ -74,4 +74,3 @@ export class AnalyticsService {
     }
   }
 }
-

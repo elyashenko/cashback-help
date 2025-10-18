@@ -1,11 +1,8 @@
 import { Context, MiddlewareFn } from 'telegraf';
-import { AnalyticsService } from '../services/analyticsService';
 import { metrics } from '../utils/monitoring';
 import { logger } from '../utils/logger';
 
-export const createAnalyticsMiddleware = (
-  analyticsService: AnalyticsService,
-): MiddlewareFn<Context> => {
+export const createAnalyticsMiddleware = (): MiddlewareFn<Context> => {
   return async (ctx, next) => {
     const startTime = Date.now();
 
@@ -26,7 +23,7 @@ export const createAnalyticsMiddleware = (
       });
     } catch (error) {
       const duration = Date.now() - startTime;
-      
+
       logger.error('Error in analytics middleware:', {
         error,
         userId: ctx.from?.id,
@@ -37,4 +34,3 @@ export const createAnalyticsMiddleware = (
     }
   };
 };
-

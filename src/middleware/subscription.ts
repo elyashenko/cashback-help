@@ -12,10 +12,10 @@ export const createSubscriptionMiddleware = (
 
     try {
       const userId = ctx.from.id;
-      
+
       // Attach subscription status to context for use in handlers
       const status = await subscriptionService.getSubscriptionStatus(userId);
-      
+
       // @ts-ignore - extending context
       ctx.subscriptionStatus = status;
 
@@ -27,7 +27,7 @@ export const createSubscriptionMiddleware = (
       ctx.subscriptionStatus = {
         type: 'free',
         isActive: true,
-        limits: { maxBanks: 4, maxCategoriesPerBank: 4 }
+        limits: { maxBanks: 4, maxCategoriesPerBank: 4 },
       };
       return next();
     }
@@ -48,4 +48,3 @@ export const requireProSubscription: MiddlewareFn<Context> = async (ctx, next) =
 
   return next();
 };
-

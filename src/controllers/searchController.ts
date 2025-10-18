@@ -7,6 +7,7 @@ import { UserService } from '../services/userService';
 import { measureTime, escapeMarkdown } from '../utils/helpers';
 import { metrics } from '../utils/monitoring';
 import { logger } from '../utils/logger';
+import { QueryType } from '../types/analytics';
 
 export class SearchController {
   constructor(
@@ -32,7 +33,7 @@ export class SearchController {
     if (!ctx.from || !ctx.message || !('text' in ctx.message)) return;
 
     const text = ctx.message.text;
-    
+
     // Skip if it's a command
     if (text.startsWith('/')) return;
 
@@ -58,8 +59,8 @@ export class SearchController {
       }
 
       let categories;
-      let queryType;
-      let responseTimeMs;
+      let queryType: QueryType;
+      let responseTimeMs: number;
 
       if (intent.queryType === 'mcc_search' && intent.mccCode) {
         // Search by MCC code
@@ -103,11 +104,7 @@ export class SearchController {
     }
   }
 
-  private async sendMccSearchResults(
-    ctx: Context,
-    mccCode: string,
-    categories: any[],
-  ) {
+  private async sendMccSearchResults(ctx: Context, mccCode: string, categories: any[]) {
     if (categories.length === 0) {
       await ctx.reply(
         `❌ MCC-код ${mccCode} не найден в базе данных.\n\n` +
@@ -130,11 +127,7 @@ export class SearchController {
     await ctx.replyWithMarkdownV2(message);
   }
 
-  private async sendCategorySearchResults(
-    ctx: Context,
-    searchTerm: string,
-    categories: any[],
-  ) {
+  private async sendCategorySearchResults(ctx: Context, searchTerm: string, categories: any[]) {
     if (categories.length === 0) {
       await ctx.reply(
         `❌ Категории по запросу "${searchTerm}" не найдены.\n\n` +
@@ -165,4 +158,3 @@ export class SearchController {
     await ctx.replyWithMarkdownV2(message);
   }
 }
-

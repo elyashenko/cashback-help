@@ -23,4 +23,3 @@ export interface AdminStats {
   averageResponseTime: number;
   popularBanks: Array<{ name: string; count: number }>;
 }
-

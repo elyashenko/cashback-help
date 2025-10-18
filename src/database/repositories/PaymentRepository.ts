@@ -33,9 +33,7 @@ export class PaymentRepository {
     await this.repository.update({ transactionId }, { status });
   }
 
-  async countByStatus(
-    status: 'pending' | 'completed' | 'failed' | 'refunded',
-  ): Promise<number> {
+  async countByStatus(status: 'pending' | 'completed' | 'failed' | 'refunded'): Promise<number> {
     return this.repository.count({ where: { status } });
   }
 
@@ -49,4 +47,3 @@ export class PaymentRepository {
     return parseInt(result.total, 10) || 0;
   }
 }
-

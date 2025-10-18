@@ -12,4 +12,3 @@ export interface CreateBankDto {
   code: string;
   logoUrl?: string;
 }
-

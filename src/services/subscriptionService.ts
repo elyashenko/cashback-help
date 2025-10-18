@@ -11,6 +11,14 @@ export class SubscriptionService {
     private favoriteRepository: FavoriteRepository,
   ) {}
 
+  async getUser(userId: number) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  }
+
   async getSubscriptionStatus(telegramId: number): Promise<SubscriptionStatus> {
     const user = await this.userRepository.findByTelegramId(telegramId);
     if (!user) {
@@ -28,43 +36,42 @@ export class SubscriptionService {
     };
   }
 
-  async canAddFavoriteBank(telegramId: number): Promise<boolean> {
-    const status = await this.getSubscriptionStatus(telegramId);
-    
+  async canAddFavoriteBank(userId: number): Promise<boolean> {
+    const user = await this.getUser(userId);
+    const status = await this.getSubscriptionStatus(user.telegramId);
+
     if (status.type === 'pro' && status.isActive) {
       return true;
     }
 
-    const user = await this.userRepository.findByTelegramId(telegramId);
-    if (!user) return false;
-
-    const bankIds = await this.favoriteRepository.getBankIdsForUser(user.id);
+    const bankIds = await this.favoriteRepository.getBankIdsForUser(userId);
     return bankIds.length < status.limits.maxBanks;
   }
 
-  async canAddFavoriteCategory(telegramId: number, bankId: number): Promise<boolean> {
-    const status = await this.getSubscriptionStatus(telegramId);
-    
+  async canAddFavoriteCategory(userId: number, bankId: number): Promise<boolean> {
+    const user = await this.getUser(userId);
+    const status = await this.getSubscriptionStatus(user.telegramId);
+
     if (status.type === 'pro' && status.isActive) {
       return true;
     }
 
-    const user = await this.userRepository.findByTelegramId(telegramId);
-    if (!user) return false;
-
-    const count = await this.favoriteRepository.countByUserAndBank(user.id, bankId);
+    const count = await this.favoriteRepository.countByUserAndBank(userId, bankId);
     return count < status.limits.maxCategoriesPerBank;
   }
 
-  async upgradeToPro(telegramId: number, durationDays: number = PRO_SUBSCRIPTION.durationDays): Promise<void> {
+  async upgradeToPro(
+    telegramId: number,
+    durationDays: number = PRO_SUBSCRIPTION.durationDays,
+  ): Promise<void> {
     try {
       const user = await this.userRepository.findByTelegramId(telegramId);
       if (!user) throw new Error('User not found');
 
       const expiryDate = calculateExpiryDate(durationDays);
-      
+
       await this.userRepository.updateSubscription(user.id, 'pro', expiryDate);
-      
+
       logger.info('User upgraded to Pro:', {
         telegramId,
         userId: user.id,
@@ -83,7 +90,7 @@ export class SubscriptionService {
       if (!user) throw new Error('User not found');
 
       await this.userRepository.updateSubscription(user.id, 'free', undefined);
-      
+
       logger.info('User downgraded to Free:', { telegramId, userId: user.id });
     } catch (error) {
       logger.error('Error downgrading to Free:', { error, telegramId });
@@ -97,4 +104,3 @@ export class SubscriptionService {
     logger.info('Checking expired subscriptions...');
   }
 }
-

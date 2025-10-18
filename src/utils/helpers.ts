@@ -3,10 +3,7 @@ import { SubscriptionType } from '../types/user';
 /**
  * Check if a subscription is active
  */
-export const isSubscriptionActive = (
-  type: SubscriptionType,
-  expiryDate?: Date,
-): boolean => {
+export const isSubscriptionActive = (type: SubscriptionType, expiryDate?: Date): boolean => {
   if (type === 'free') return true;
   if (!expiryDate) return false;
   return expiryDate > new Date();
@@ -27,11 +24,8 @@ export const calculateExpiryDate = (durationDays: number): Date => {
 export const isMonthlyResetDay = (resetDate: Date): boolean => {
   const now = new Date();
   const lastReset = new Date(resetDate);
-  
-  return (
-    now.getMonth() !== lastReset.getMonth() ||
-    now.getFullYear() !== lastReset.getFullYear()
-  );
+
+  return now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear();
 };
 
 /**
@@ -70,4 +64,3 @@ export const measureTime = async <T>(
   const duration = Date.now() - start;
   return { result, duration };
 };
-

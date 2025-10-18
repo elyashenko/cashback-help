@@ -17,4 +17,3 @@ export interface CreateUserDto {
   username?: string;
   firstName?: string;
 }
-

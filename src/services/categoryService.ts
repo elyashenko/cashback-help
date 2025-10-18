@@ -8,7 +8,7 @@ export class CategoryService {
 
   async getCategoriesByBank(bankId: number): Promise<CashbackCategory[]> {
     const cacheKey = getCacheKey('categories', 'bank', bankId);
-    
+
     let categories = getCached<CashbackCategory[]>(cacheKey);
     if (categories) {
       return categories;
@@ -16,14 +16,11 @@ export class CategoryService {
 
     categories = await this.categoryRepository.findByBankId(bankId);
     setCached(cacheKey, categories);
-    
+
     return categories;
   }
 
-  async findCategoriesByMccCode(
-    mccCode: string,
-    bankId?: number,
-  ): Promise<CashbackCategory[]> {
+  async findCategoriesByMccCode(mccCode: string, bankId?: number): Promise<CashbackCategory[]> {
     try {
       const categories = await this.categoryRepository.findByMccCode(mccCode, bankId);
       logger.info('MCC search completed:', {
@@ -31,7 +28,7 @@ export class CategoryService {
         bankId,
         resultsCount: categories.length,
       });
-      
+
       return categories;
     } catch (error) {
       logger.error('Error searching by MCC code:', { error, mccCode, bankId });
@@ -39,10 +36,7 @@ export class CategoryService {
     }
   }
 
-  async searchCategoriesByName(
-    searchTerm: string,
-    bankId?: number,
-  ): Promise<CashbackCategory[]> {
+  async searchCategoriesByName(searchTerm: string, bankId?: number): Promise<CashbackCategory[]> {
     try {
       const categories = await this.categoryRepository.searchByName(searchTerm, bankId);
       logger.info('Category search completed:', {
@@ -50,7 +44,7 @@ export class CategoryService {
         bankId,
         resultsCount: categories.length,
       });
-      
+
       return categories;
     } catch (error) {
       logger.error('Error searching categories:', { error, searchTerm, bankId });
@@ -81,7 +75,7 @@ export class CategoryService {
         count: created.length,
         bankId: categories[0]?.bankId,
       });
-      
+
       return created;
     } catch (error) {
       logger.error('Error bulk creating categories:', { error });
@@ -114,4 +108,3 @@ export class CategoryService {
     }
   }
 }
-
