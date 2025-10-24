@@ -17,7 +17,8 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "get-telegram-id": "tsx --env-file=.env scripts/get-telegram-id.ts"
   },
   "keywords": [
     "telegram",

@@ -13,6 +13,7 @@ import { FavoriteRepository } from './database/repositories/FavoriteRepository';
 import { PaymentRepository } from './database/repositories/PaymentRepository';
 import { AnalyticsRepository } from './database/repositories/AnalyticsRepository';
 import { UserCashbackRepository } from './database/repositories/UserCashbackRepository';
+import { AdminSettingsRepository } from './database/repositories/AdminSettingsRepository';
 
 // Services
 import { UserService } from './services/userService';
@@ -24,6 +25,8 @@ import { LLMService } from './services/llmService';
 import { AnalyticsService } from './services/analyticsService';
 import { PDFService } from './services/pdfService';
 import { UserCashbackService } from './services/userCashbackService';
+import { AdminSettingsService } from './services/adminSettingsService';
+import { ServiceType } from './database/entities/AdminSettings';
 
 // Controllers
 import { BotController } from './controllers/botController';
@@ -39,6 +42,8 @@ import { createRateLimitMiddleware } from './middleware/rateLimit';
 import { createSubscriptionMiddleware } from './middleware/subscription';
 import { createAnalyticsMiddleware } from './middleware/analytics';
 import { createFSMMiddleware } from './middleware/fsm';
+import { createServiceAccessMiddleware } from './middleware/serviceAccess';
+import { createSessionMiddleware } from './middleware/session';
 
 // Load environment variables
 dotenv.config();
@@ -67,6 +72,10 @@ async function bootstrap() {
     const paymentRepository = new PaymentRepository();
     const analyticsRepository = new AnalyticsRepository();
     const userCashbackRepository = new UserCashbackRepository();
+    const adminSettingsRepository = new AdminSettingsRepository();
+
+    // Initialize admin settings
+    await adminSettingsRepository.initializeDefaultSettings();
 
     // Initialize services
     const userService = new UserService(userRepository);
@@ -85,6 +94,7 @@ async function bootstrap() {
       userCashbackRepository,
       subscriptionService,
     );
+    const adminSettingsService = new AdminSettingsService(adminSettingsRepository);
 
     // Initialize controllers
     const botController = new BotController(userService, bankService, analyticsService);
@@ -107,7 +117,7 @@ async function bootstrap() {
       subscriptionService,
       userService,
     );
-    const adminController = new AdminController(categoryService, pdfService, analyticsService);
+    const adminController = new AdminController(categoryService, pdfService, analyticsService, adminSettingsService);
     const cashbackController = new CashbackController(
       userCashbackService,
       categoryService,
@@ -118,10 +128,12 @@ async function bootstrap() {
 
     // Apply middleware
     bot.use(errorHandler);
+    bot.use(createSessionMiddleware());
     bot.use(createAnalyticsMiddleware());
     bot.use(createSubscriptionMiddleware(subscriptionService));
     bot.use(createRateLimitMiddleware());
     bot.use(createFSMMiddleware());
+    bot.use(createServiceAccessMiddleware(adminSettingsService));
 
     // Register commands
     bot.command('start', (ctx) => botController.handleStart(ctx));
@@ -139,20 +151,39 @@ async function bootstrap() {
     bot.command('admin_add_bank', (ctx) => adminController.handleAdminAddBank(ctx));
     bot.command('admin_parse_pdf', (ctx) => adminController.handleAdminParsePDF(ctx));
     bot.command('admin_stats', (ctx) => adminController.handleAdminStats(ctx));
+    bot.command('admin_services', (ctx) => adminController.handleAdminServices(ctx));
 
     // Handle text queries
     bot.on('text', (ctx) => {
       const session = ctx.session;
       const cashbackSession = session?.cashback;
+      const adminSession = session?.admin;
 
+      logger.debug('Text message received', { 
+        userId: ctx.from?.id, 
+        text: ctx.message.text,
+        hasSession: !!session,
+        hasAdminSession: !!adminSession,
+        waitingForUserId: adminSession?.waitingForUserId
+      });
+
+      // Check if admin is waiting for user ID input
+      if (adminSession?.waitingForUserId) {
+        logger.debug('Processing admin user ID input', { 
+          userId: ctx.from?.id, 
+          serviceType: adminSession.waitingForUserId 
+        });
+        adminController.handleUserIdInput(ctx);
+      }
       // Check if user is waiting for cashback rate input
-      if (cashbackSession?.waitingForRates) {
+      else if (cashbackSession?.waitingForRates) {
         cashbackController.handleCashbackRateInput(ctx);
       } else if (session?.favorites?.waitingForCashbackRate) {
         favoritesController.handleCashbackRateInput(ctx);
       } else if (session?.favorites?.selectedBank && !session?.favorites?.waitingForCashbackRate) {
         favoritesController.handleSearchResults(ctx, ctx.message.text);
       } else {
+        logger.debug('Processing as search query', { userId: ctx.from?.id });
         searchController.handleTextQuery(ctx);
       }
     });
@@ -217,6 +248,38 @@ async function bootstrap() {
       const categoryId = parseInt(ctx.match[2]);
       favoritesController.handleRemoveCategory(ctx, bankId, categoryId);
     });
+
+    // Admin callback handlers
+    bot.action(/^admin_service:(.+)$/, (ctx) => {
+      const serviceType = ctx.match[1] as ServiceType;
+      adminController.handleServiceSelection(ctx, serviceType);
+    });
+
+    bot.action(/^admin_toggle_global:(.+)$/, (ctx) => {
+      const serviceType = ctx.match[1] as ServiceType;
+      adminController.handleToggleGlobalService(ctx, serviceType);
+    });
+
+    bot.action(/^admin_user_settings:(.+)$/, (ctx) => {
+      const serviceType = ctx.match[1] as ServiceType;
+      adminController.handleUserServiceSettings(ctx, serviceType);
+    });
+
+    bot.action(/^admin_toggle_user:(.+):(\d+)$/, (ctx) => {
+      const serviceType = ctx.match[1] as ServiceType;
+      const userId = parseInt(ctx.match[2]);
+      adminController.handleToggleUserService(ctx, serviceType, userId);
+    });
+
+    bot.action(/^admin_remove_user:(.+):(\d+)$/, (ctx) => {
+      const serviceType = ctx.match[1] as ServiceType;
+      const userId = parseInt(ctx.match[2]);
+      adminController.handleRemoveUserSetting(ctx, serviceType, userId);
+    });
+
+    bot.action('admin_services', (ctx) => adminController.handleAdminServices(ctx));
+    bot.action('admin_status_all', (ctx) => adminController.handleStatusAllServices(ctx));
+    bot.action('admin_reset_settings', (ctx) => adminController.handleResetSettings(ctx));
 
     // Handle payments
     bot.on('pre_checkout_query', (ctx) => paymentService.handlePreCheckoutQuery(ctx));

@@ -1,3 +1,5 @@
+import { ServiceType } from '../database/entities/AdminSettings';
+
 export interface CashbackSession {
   selectedBank?: string;
   selectedCategories?: number[];
@@ -11,7 +13,12 @@ export interface FavoritesSession {
   currentCategoryIndex?: number;
 }
 
+export interface AdminSession {
+  waitingForUserId?: ServiceType;
+}
+
 export interface BotSession {
   cashback?: CashbackSession;
   favorites?: FavoritesSession;
+  admin?: AdminSession;
 }

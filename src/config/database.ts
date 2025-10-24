@@ -6,6 +6,7 @@ import { UserFavoriteCategory } from '../database/entities/UserFavoriteCategory'
 import { UserCashbackSetting } from '../database/entities/UserCashbackSetting';
 import { PaymentHistory } from '../database/entities/PaymentHistory';
 import { QueryLog } from '../database/entities/QueryLog';
+import { AdminSettings } from '../database/entities/AdminSettings';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -20,6 +21,7 @@ export const AppDataSource = new DataSource({
     UserCashbackSetting,
     PaymentHistory,
     QueryLog,
+    AdminSettings,
   ],
   migrations: ['src/database/migrations/*.ts'],
   subscribers: [],
