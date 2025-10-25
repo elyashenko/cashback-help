@@ -77,7 +77,7 @@ export class FavoritesController {
       }
 
       // Показываем лимиты для Free пользователей
-      const status = await this.subscriptionService.getSubscriptionStatus(user.id);
+      const status = await this.subscriptionService.getSubscriptionStatus(ctx.from.id);
       if (status.type === 'free') {
         const bankCount = byBank.size;
         message += `📊 Использовано банков: ${bankCount}/${status.limits.maxBanks}\n`;
@@ -111,7 +111,7 @@ export class FavoritesController {
       });
 
       // Проверяем лимиты подписки
-      const status = await this.subscriptionService.getSubscriptionStatus(user.id);
+      const status = await this.subscriptionService.getSubscriptionStatus(ctx.from.id);
       const bankCount = await this.favoriteRepository.getBankIdsForUser(user.id);
 
       if (status.type === 'free' && bankCount.length >= status.limits.maxBanks) {
@@ -157,7 +157,7 @@ export class FavoritesController {
       });
 
       // Проверяем лимиты для конкретного банка
-      const status = await this.subscriptionService.getSubscriptionStatus(user.id);
+      const status = await this.subscriptionService.getSubscriptionStatus(ctx.from.id);
       const categoriesInBank = await this.favoriteRepository.countByUserAndBank(user.id, bank.id);
 
       if (status.type === 'free' && categoriesInBank >= status.limits.maxCategoriesPerBank) {

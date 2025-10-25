@@ -23,7 +23,7 @@ export class PaymentController {
         return;
       }
 
-      const status = await this.subscriptionService.getSubscriptionStatus(user.id);
+      const status = await this.subscriptionService.getSubscriptionStatus(ctx.from.id);
 
       let message = '💳 *Информация о подписке*\n\n';
 
@@ -69,7 +69,7 @@ export class PaymentController {
       }
 
       // Check if already Pro
-      const status = await this.subscriptionService.getSubscriptionStatus(user.id);
+      const status = await this.subscriptionService.getSubscriptionStatus(ctx.from.id);
       if (status.type === 'pro' && status.isActive) {
         await ctx.answerCbQuery('У вас уже есть активная Pro подписка');
         return;
