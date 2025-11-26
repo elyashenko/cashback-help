@@ -12,7 +12,7 @@ import { CategoryRepository } from './database/repositories/CategoryRepository';
 import { FavoriteRepository } from './database/repositories/FavoriteRepository';
 import { PaymentRepository } from './database/repositories/PaymentRepository';
 import { AnalyticsRepository } from './database/repositories/AnalyticsRepository';
-import { UserCashbackRepository } from './database/repositories/UserCashbackRepository';
+// import { UserCashbackRepository } from './database/repositories/UserCashbackRepository';
 
 // Services
 import { UserService } from './services/userService';
@@ -23,15 +23,15 @@ import { PaymentService } from './services/paymentService';
 import { LLMService } from './services/llmService';
 import { AnalyticsService } from './services/analyticsService';
 import { PDFService } from './services/pdfService';
-import { UserCashbackService } from './services/userCashbackService';
+// import { UserCashbackService } from './services/userCashbackService';
 
 // Controllers
 import { BotController } from './controllers/botController';
 import { SearchController } from './controllers/searchController';
-import { FavoritesController } from './controllers/favoritesController';
+// import { FavoritesController } from './controllers/favoritesController';
 import { PaymentController } from './controllers/paymentController';
 import { AdminController } from './controllers/adminController';
-import { CashbackController } from './controllers/cashbackController';
+// import { CashbackController } from './controllers/cashbackController';
 
 // Middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -66,7 +66,8 @@ async function bootstrap() {
     const favoriteRepository = new FavoriteRepository();
     const paymentRepository = new PaymentRepository();
     const analyticsRepository = new AnalyticsRepository();
-    const userCashbackRepository = new UserCashbackRepository();
+    // UserCashbackRepository temporarily disabled
+    // const userCashbackRepository = new UserCashbackRepository();
 
     // Initialize services
     const userService = new UserService(userRepository);
@@ -81,10 +82,11 @@ async function bootstrap() {
       favoriteRepository,
     );
     const pdfService = new PDFService();
-    const userCashbackService = new UserCashbackService(
-      userCashbackRepository,
-      subscriptionService,
-    );
+    // UserCashbackService temporarily disabled
+    // const userCashbackService = new UserCashbackService(
+    //   userCashbackRepository,
+    //   subscriptionService,
+    // );
 
     // Initialize controllers
     const botController = new BotController(userService, bankService, analyticsService);
@@ -95,26 +97,28 @@ async function bootstrap() {
       analyticsService,
       userService,
     );
-    const favoritesController = new FavoritesController(
-      favoriteRepository,
-      categoryRepository,
-      bankService,
-      subscriptionService,
-      userService,
-    );
+    // FavoritesController temporarily disabled
+    // const favoritesController = new FavoritesController(
+    //   favoriteRepository,
+    //   categoryRepository,
+    //   bankService,
+    //   subscriptionService,
+    //   userService,
+    // );
     const paymentController = new PaymentController(
       paymentService,
       subscriptionService,
       userService,
     );
     const adminController = new AdminController(categoryService, pdfService, analyticsService);
-    const cashbackController = new CashbackController(
-      userCashbackService,
-      categoryService,
-      categoryRepository,
-      bankService,
-      userService,
-    );
+    // Cashback controller temporarily disabled
+    // const cashbackController = new CashbackController(
+    //   userCashbackService,
+    //   categoryService,
+    //   categoryRepository,
+    //   bankService,
+    //   userService,
+    // );
 
     // Apply middleware
     bot.use(errorHandler);
@@ -129,11 +133,12 @@ async function bootstrap() {
     bot.command('banks', (ctx) => botController.handleBanks(ctx));
     bot.command('stats', (ctx) => botController.handleStats(ctx));
     bot.command('search', (ctx) => searchController.handleSearch(ctx));
-    bot.command('favorites', (ctx) => favoritesController.handleFavorites(ctx));
+    // bot.command('favorites', (ctx) => favoritesController.handleFavorites(ctx));
     bot.command('subscription', (ctx) => paymentController.handleSubscription(ctx));
-    bot.command('set_cashback', (ctx) => cashbackController.handleSetCashback(ctx));
-    bot.command('my_cashback', (ctx) => cashbackController.handleMyCashback(ctx));
-    bot.command('remove_cashback', (ctx) => cashbackController.handleRemoveCashback(ctx));
+    // Cashback commands temporarily disabled
+    // bot.command('set_cashback', (ctx) => cashbackController.handleSetCashback(ctx));
+    // bot.command('my_cashback', (ctx) => cashbackController.handleMyCashback(ctx));
+    // bot.command('remove_cashback', (ctx) => cashbackController.handleRemoveCashback(ctx));
 
     // Admin commands
     bot.command('admin_add_bank', (ctx) => adminController.handleAdminAddBank(ctx));
@@ -142,81 +147,84 @@ async function bootstrap() {
 
     // Handle text queries
     bot.on('text', (ctx) => {
-      const session = ctx.session;
-      const cashbackSession = session?.cashback;
+      // const session = ctx.session;
+      // const cashbackSession = session?.cashback;
 
       // Check if user is waiting for cashback rate input
-      if (cashbackSession?.waitingForRates) {
-        cashbackController.handleCashbackRateInput(ctx);
-      } else if (session?.favorites?.waitingForCashbackRate) {
-        favoritesController.handleCashbackRateInput(ctx);
-      } else if (session?.favorites?.selectedBank && !session?.favorites?.waitingForCashbackRate) {
-        favoritesController.handleSearchResults(ctx, ctx.message.text);
-      } else {
+      // Cashback functionality temporarily disabled
+      // if (cashbackSession?.waitingForRates) {
+      //   cashbackController.handleCashbackRateInput(ctx);
+      // } else 
+      // Favorites functionality temporarily disabled
+      // if (session?.favorites?.waitingForCashbackRate) {
+      //   favoritesController.handleCashbackRateInput(ctx);
+      // } else if (session?.favorites?.selectedBank && !session?.favorites?.waitingForCashbackRate) {
+      //   favoritesController.handleSearchResults(ctx, ctx.message.text);
+      // } else {
         searchController.handleTextQuery(ctx);
-      }
+      // }
     });
 
     // Handle callback queries
     bot.action('buy_pro', (ctx) => paymentController.handleBuyProCallback(ctx));
 
-    // Cashback callback handlers
-    bot.action(/^select_bank:(.+)$/, (ctx) => {
-      const bankCode = ctx.match[1];
-      cashbackController.handleBankSelect(ctx, bankCode);
-    });
+    // Cashback callback handlers - temporarily disabled
+    // bot.action(/^select_bank:(.+)$/, (ctx) => {
+    //   const bankCode = ctx.match[1];
+    //   cashbackController.handleBankSelect(ctx, bankCode);
+    // });
 
-    bot.action(/^toggle_category:(\d+)$/, (ctx) => {
-      const categoryId = parseInt(ctx.match[1]);
-      cashbackController.handleToggleCategory(ctx, categoryId);
-    });
+    // bot.action(/^toggle_category:(\d+)$/, (ctx) => {
+    //   const categoryId = parseInt(ctx.match[1]);
+    //   cashbackController.handleToggleCategory(ctx, categoryId);
+    // });
 
-    bot.action('confirm_categories', (ctx) => {
-      cashbackController.handleConfirmCategories(ctx);
-    });
+    // bot.action('confirm_categories', (ctx) => {
+    //   cashbackController.handleConfirmCategories(ctx);
+    // });
 
-    bot.action(/^remove_cashback:(\d+):(\d+)$/, (ctx) => {
-      const bankId = parseInt(ctx.match[1]);
-      const categoryId = parseInt(ctx.match[2]);
-      cashbackController.handleRemoveCashbackConfirm(ctx, bankId, categoryId);
-    });
+    // bot.action(/^remove_cashback:(\d+):(\d+)$/, (ctx) => {
+    //   const bankId = parseInt(ctx.match[1]);
+    //   const categoryId = parseInt(ctx.match[2]);
+    //   cashbackController.handleRemoveCashbackConfirm(ctx, bankId, categoryId);
+    // });
 
-    // Favorites callback handlers
-    bot.action('favorites_add', (ctx) => favoritesController.handleAddFavorites(ctx));
-    bot.action('favorites_remove', (ctx) => favoritesController.handleRemoveFavorites(ctx));
+    // Favorites callback handlers - temporarily disabled
+    // bot.action('favorites_add', (ctx) => favoritesController.handleAddFavorites(ctx));
+    // bot.action('favorites_remove', (ctx) => favoritesController.handleRemoveFavorites(ctx));
 
-    bot.action(/^fav_select_bank:(.+)$/, (ctx) => {
-      const bankCode = ctx.match[1];
-      favoritesController.handleSelectBank(ctx, bankCode);
-    });
+    // bot.action(/^fav_select_bank:(.+)$/, (ctx) => {
+    //   const bankCode = ctx.match[1];
+    //   favoritesController.handleSelectBank(ctx, bankCode);
+    // });
 
-    bot.action(/^fav_search:(.+)$/, (ctx) => {
-      const bankCode = ctx.match[1];
-      favoritesController.handleSearchCategories(ctx, bankCode);
-    });
+    // bot.action(/^fav_search:(.+)$/, (ctx) => {
+    //   const bankCode = ctx.match[1];
+    //   favoritesController.handleSearchCategories(ctx, bankCode);
+    // });
 
-    bot.action(/^fav_select_category:(.+):(\d+)$/, (ctx) => {
-      const bankCode = ctx.match[1];
-      const categoryId = parseInt(ctx.match[2]);
-      favoritesController.handleSelectCategory(ctx, bankCode, categoryId);
-    });
+    // bot.action(/^fav_select_category:(.+):(\d+)$/, (ctx) => {
+    //   const bankCode = ctx.match[1];
+    //   const categoryId = parseInt(ctx.match[2]);
+    //   favoritesController.handleSelectCategory(ctx, bankCode, categoryId);
+    // });
 
-    bot.action(/^fav_show_mcc:(\d+)$/, (ctx) => {
-      const categoryId = parseInt(ctx.match[1]);
-      favoritesController.handleShowMccCodes(ctx, categoryId);
-    });
+    // bot.action(/^fav_show_mcc:(\d+)$/, (ctx) => {
+    //   const categoryId = parseInt(ctx.match[1]);
+    //   favoritesController.handleShowMccCodes(ctx, categoryId);
+    // });
 
-    bot.action(/^fav_add_no_rate:(.+):(\d+)$/, (ctx) => {
-      const bankCode = ctx.match[1];
-      const categoryId = parseInt(ctx.match[2]);
-      favoritesController.handleAddNoRate(ctx, bankCode, categoryId);
-    });
+    // bot.action(/^fav_add_no_rate:(.+):(\d+)$/, (ctx) => {
+    //   const bankCode = ctx.match[1];
+    //   const categoryId = parseInt(ctx.match[2]);
+    //   favoritesController.handleAddNoRate(ctx, bankCode, categoryId);
+    // });
 
-    bot.action(/^fav_remove:(\d+):(\d+)$/, (ctx) => {
-      const bankId = parseInt(ctx.match[1]);
-      const categoryId = parseInt(ctx.match[2]);
-      favoritesController.handleRemoveCategory(ctx, bankId, categoryId);
-    });
+    // bot.action(/^fav_remove:(\d+):(\d+)$/, (ctx) => {
+    //   const bankId = parseInt(ctx.match[1]);
+    //   const categoryId = parseInt(ctx.match[2]);
+    //   favoritesController.handleRemoveCategory(ctx, bankId, categoryId);
+    // });
 
     // Handle payments
     bot.on('pre_checkout_query', (ctx) => paymentService.handlePreCheckoutQuery(ctx));
@@ -228,9 +236,10 @@ async function bootstrap() {
       { command: 'help', description: 'Показать справку' },
       { command: 'search', description: 'Поиск категорий и MCC-кодов' },
       { command: 'banks', description: 'Список доступных банков' },
-      { command: 'favorites', description: 'Избранные категории' },
-      { command: 'set_cashback', description: 'Установить процент кэшбэка' },
-      { command: 'my_cashback', description: 'Мои настройки кэшбэка' },
+      // { command: 'favorites', description: 'Избранные категории' },
+      // Cashback commands temporarily disabled
+      // { command: 'set_cashback', description: 'Установить процент кэшбэка' },
+      // { command: 'my_cashback', description: 'Мои настройки кэшбэка' },
       { command: 'subscription', description: 'Управление подпиской' },
       { command: 'stats', description: 'Ваша статистика' },
     ]);
