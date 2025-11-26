@@ -160,7 +160,7 @@ cashback-help-bot/
 ├── data/banks/                  # Sample data
 ├── docs/                        # Documentation
 ├── tests/                       # Test files
-├── docker-compose.yml
+├── k8s/                 # Kubernetes deployment manifests
 ├── Dockerfile
 ├── package.json
 ├── tsconfig.json

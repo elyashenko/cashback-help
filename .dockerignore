@@ -17,9 +17,11 @@ README.md
 logs
 tests
 jest.config.js
-tsconfig.json
 .prettierrc
 eslint.config.mjs
-docker-compose.yml
 Dockerfile
+k8s
+*.md
+docs
+data
 

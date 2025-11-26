@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import * as Sentry from '@sentry/node';
+import http from 'http';
 import { bot, startBot } from './config/telegram';
 import { initializeDatabase } from './config/database';
 import { logger } from './utils/logger';
@@ -244,6 +245,26 @@ async function bootstrap() {
       { command: 'stats', description: 'Ваша статистика' },
     ]);
 
+    // Start health check HTTP server
+    const port = parseInt(process.env.BOT_PORT || '9090', 10);
+    const healthServer = http.createServer((req, res) => {
+      if (req.url === '/health' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }));
+      } else if (req.url === '/metrics' && req.method === 'GET') {
+        // Prometheus metrics endpoint (if needed)
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('# Metrics endpoint\n');
+      } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Not found' }));
+      }
+    });
+
+    healthServer.listen(port, () => {
+      logger.info(`Health check server listening on port ${port}`);
+    });
+
     // Start bot
     await startBot();
 
@@ -264,6 +285,19 @@ process.on('uncaughtException', (error) => {
   logger.error('Uncaught exception:', error);
   Sentry.captureException(error);
   process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, shutting down gracefully...');
+  await bot.stop('SIGTERM');
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, shutting down gracefully...');
+  await bot.stop('SIGINT');
+  process.exit(0);
 });
 
 // Start application

@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cashback-bot
+  namespace: cashback-bot
+  labels:
+    app: cashback-bot
+spec:
+  replicas: 1  # Увеличьте для высокой доступности
+  selector:
+    matchLabels:
+      app: cashback-bot
+  template:
+    metadata:
+      labels:
+        app: cashback-bot
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: postgres:15-alpine
+        command: ['sh', '-c']
+        args:
+        - |
+          until pg_isready -h postgres -p 5432 -U postgres; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+          echo "Postgres is ready!"
+      containers:
+      - name: bot
+        image: cashback-bot:latest  # Измените на ваш registry/image:tag
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9090
+          name: http
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_DB
+        - name: BOT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: bot-secret
+              key: BOT_TOKEN
+        - name: DEEPSEEK_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bot-secret
+              key: DEEPSEEK_API_KEY
+        - name: YANDEX_GPT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: bot-secret
+              key: YANDEX_GPT_API_KEY
+              optional: true
+        - name: YANDEX_GPT_FOLDER_ID
+          valueFrom:
+            secretKeyRef:
+              name: bot-secret
+              key: YANDEX_GPT_FOLDER_ID
+              optional: true
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: bot-secret
+              key: SENTRY_DSN
+              optional: true
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: bot-config
+              key: NODE_ENV
+        - name: DATABASE_LOGGING
+          valueFrom:
+            configMapKeyRef:
+              name: bot-config
+              key: DATABASE_LOGGING
+        - name: BOT_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: bot-config
+              key: BOT_PORT
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9090
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9090
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: logs
+        emptyDir: {}  # Или используйте PersistentVolume для сохранения логов
+

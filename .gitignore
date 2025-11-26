@@ -37,3 +37,6 @@ logs/
 tmp/
 temp/
 
+# Kubernetes secrets (ensure no real secrets are committed)
+# k8s/*-secret.yaml files contain templates with empty values
+

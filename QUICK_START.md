@@ -21,13 +21,7 @@ DEEPSEEK_API_KEY=your_deepseek_api_key  # Или используйте Yandex G
 
 ### 3. Запуск базы данных
 
-#### Вариант A: Docker Compose (рекомендуется)
-
-```bash
-docker-compose up -d postgres
-```
-
-#### Вариант B: Локальный PostgreSQL
+#### Вариант A: Локальный PostgreSQL (для разработки)
 
 ```bash
 # Создайте базу данных
@@ -56,23 +50,43 @@ npm run dev
 
 Бот запустится в режиме разработки с автоматической перезагрузкой при изменении файлов.
 
-## 🐳 Запуск через Docker
+## 🚀 Деплой в Kubernetes
 
-Самый простой способ запустить весь проект:
+Для production используйте Kubernetes:
 
 ```bash
-# Создайте .env файл
-cp .env.example .env
-# Отредактируйте .env
+# 1. Соберите Docker образ
+docker build -t your-username/cashback-bot:latest .
 
-# Запустите все сервисы
-docker-compose up -d
+# 2. Опубликуйте образ
+docker push your-username/cashback-bot:latest
 
-# Просмотр логов
-docker-compose logs -f bot
+# 3. Настройте секреты в k8s/ директории
+# Отредактируйте k8s/postgres-secret.yaml и k8s/bot-secret.yaml
 
-# Остановка
-docker-compose down
+# 4. Деплой
+kubectl apply -k k8s/
+
+# 5. Просмотр логов
+kubectl logs -f deployment/cashback-bot -n cashback-bot
+```
+
+Подробная инструкция: [K8S_DEPLOY.md](K8S_DEPLOY.md)
+
+### Локальная разработка с Kubernetes (minikube/kind)
+
+Для локальной разработки можно использовать minikube или kind:
+
+```bash
+# Запуск minikube
+minikube start
+
+# Использование Docker registry minikube
+eval $(minikube docker-env)
+docker build -t cashback-bot:latest .
+
+# Деплой в minikube
+kubectl apply -k k8s/
 ```
 
 ## 🧪 Тестирование
@@ -129,18 +143,21 @@ npm start
 ### База данных не подключается
 
 ```bash
-# Проверьте, что PostgreSQL запущен
-docker-compose ps
-
-# Или для локального PostgreSQL
+# Для локального PostgreSQL
 pg_isready
+
+# Для Kubernetes
+kubectl get pods -n cashback-bot
+kubectl logs deployment/postgres -n cashback-bot
 ```
 
 ### Бот не отвечает
 
-1. Проверьте `BOT_TOKEN` в `.env`
+1. Проверьте `BOT_TOKEN` в секретах Kubernetes или `.env`
 2. Убедитесь, что токен валидный (получен от @BotFather)
-3. Проверьте логи: `docker-compose logs bot` или терминал
+3. Проверьте логи:
+   - Локально: терминал или `logs/combined.log`
+   - Kubernetes: `kubectl logs deployment/cashback-bot -n cashback-bot`
 
 ### LangChain ошибки
 

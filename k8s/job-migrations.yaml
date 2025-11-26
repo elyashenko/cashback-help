@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: run-migrations
+  namespace: cashback-bot
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      initContainers:
+      - name: wait-for-db
+        image: postgres:15-alpine
+        command: ['sh', '-c']
+        args:
+        - |
+          until pg_isready -h postgres -p 5432 -U postgres; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+          echo "Postgres is ready!"
+      containers:
+      - name: migrations
+        image: cashback-bot:latest
+        command: ['sh', '-c']
+        args:
+        - |
+          export DATABASE_URL="postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)"
+          cd /app
+          # Запуск SQL миграций
+          for migration in src/database/migrations/*.sql; do
+            if [ -f "$migration" ]; then
+              echo "Running migration: $(basename $migration)"
+              psql "$DATABASE_URL" -f "$migration" || echo "Migration failed or already applied"
+            fi
+          done
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_DB
+      backoffLimit: 3
+

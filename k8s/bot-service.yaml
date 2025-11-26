@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cashback-bot
+  namespace: cashback-bot
+  labels:
+    app: cashback-bot
+spec:
+  type: ClusterIP  # Измените на LoadBalancer или NodePort если нужен внешний доступ
+  ports:
+  - port: 9090
+    targetPort: 9090
+    protocol: TCP
+    name: http
+  selector:
+    app: cashback-bot
+

@@ -48,7 +48,8 @@ Before you begin, ensure you have the following installed:
 - Node.js >= 18.0.0
 - PostgreSQL >= 15
 - npm >= 9.0.0
-- Docker & Docker Compose (optional)
+- Docker (optional, для сборки образов)
+- Kubernetes (для production деплоя)
 
 ## 🚀 Installation
 
@@ -80,23 +81,28 @@ npm run seed
 npm run dev
 ```
 
-### Option 2: Docker
+### Option 2: Kubernetes (Production)
 
 ```bash
 # 1. Clone repository
 git clone https://github.com/yourusername/cashback-help-bot.git
 cd cashback-help-bot
 
-# 2. Setup environment
-cp .env.example .env
-# Edit .env file with your credentials
+# 2. Build and push Docker image
+docker build -t your-username/cashback-bot:latest .
+docker push your-username/cashback-bot:latest
 
-# 3. Start with Docker Compose
-docker-compose up -d
+# 3. Configure secrets in k8s/ directory
+# Edit k8s/postgres-secret.yaml and k8s/bot-secret.yaml
 
-# 4. View logs
-docker-compose logs -f bot
+# 4. Deploy to Kubernetes
+kubectl apply -k k8s/
+
+# 5. View logs
+kubectl logs -f deployment/cashback-bot -n cashback-bot
 ```
+
+Подробная инструкция: [K8S_DEPLOY.md](K8S_DEPLOY.md)
 
 ## ⚙️ Configuration
 
@@ -268,7 +274,7 @@ cashback-help-bot/
 ├── docs/                # Documentation
 ├── migrations/          # SQL migrations
 ├── Dockerfile           # Docker configuration
-├── docker-compose.yml   # Docker Compose configuration
+├── k8s/                 # Kubernetes manifests
 └── README.md           # This file
 ```
 

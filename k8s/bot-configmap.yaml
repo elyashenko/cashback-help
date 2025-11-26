@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bot-config
+  namespace: cashback-bot
+data:
+  NODE_ENV: "production"
+  DATABASE_LOGGING: "false"
+  BOT_PORT: "9090"
+  # DATABASE_URL будет сформирован автоматически из сервиса postgres
+
